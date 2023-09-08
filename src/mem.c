@@ -13,6 +13,11 @@ RAM *newRAM(uint8_t *code, size_t len) {
   return ram;
 }
 
+void freeRAM(RAM *mem) {
+	free(mem->mem);
+	free(mem);
+}
+
 uint64_t ram_load(RAM *mem, uint64_t addr, uint8_t size) {
   uint64_t r = 0;
   switch (size) {
@@ -129,6 +134,8 @@ void RAM_test() {
   ram_store(mem, RAM_BASE + 2, 123456789, 64);
   uint64_t v64 = ram_load(mem, RAM_BASE + 2, 64);
   assert(v64 == 123456789);
+
+  freeRAM(mem);
 
   printf("===== RAM tests passed ====\n");
 }
