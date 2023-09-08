@@ -14,8 +14,8 @@ RAM *newRAM(uint8_t *code, size_t len) {
 }
 
 void freeRAM(RAM *mem) {
-	free(mem->mem);
-	free(mem);
+  free(mem->mem);
+  free(mem);
 }
 
 uint64_t ram_load(RAM *mem, uint64_t addr, uint8_t size) {
