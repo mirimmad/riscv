@@ -14,7 +14,7 @@ RAM * newRAM(uint8_t * code, size_t len) {
 }
 
 uint64_t ram_load(RAM * mem, uint64_t addr, uint8_t size) {
-uint64_t r = 0;
+	uint64_t r = 0;
 	switch(size) {
 	case 8:
 		r = ram_load8(mem, addr);
@@ -70,29 +70,29 @@ uint64_t ram_load8(RAM * mem, uint64_t addr) {
 uint64_t ram_load16(RAM * mem, uint64_t addr) {
 	size_t index = addr - RAM_BASE;
 	return ((uint64_t) mem->mem[index]
-			|((uint64_t) mem->mem[index + 1] << 8)
+		|((uint64_t) mem->mem[index + 1] << 8)
 			);
 }
 
 uint64_t ram_load32(RAM * mem, uint64_t addr) {
 	size_t index = addr - RAM_BASE;
 	return ((uint64_t) mem->mem[index]
-			|((uint64_t) mem->mem[index + 1] << 8)
-			|((uint64_t) mem->mem[index + 2] << 16)
-			|((uint64_t) mem->mem[index + 3] << 24)
+		|((uint64_t) mem->mem[index + 1] << 8)
+		|((uint64_t) mem->mem[index + 2] << 16)
+		|((uint64_t) mem->mem[index + 3] << 24)
 			);
 }
 
 uint64_t ram_load64(RAM * mem, uint64_t addr) {
 	size_t index = addr - RAM_BASE;
 	return ((uint64_t) mem->mem[index]
-			|((uint64_t) mem->mem[index + 1] << 8)
-			|((uint64_t) mem->mem[index + 2] << 16)
-			|((uint64_t) mem->mem[index + 3] << 24)
-			|((uint64_t) mem->mem[index + 4] << 32)
-			|((uint64_t) mem->mem[index + 5] << 40)
-			|((uint64_t) mem->mem[index + 6] << 48)
-			|((uint64_t) mem->mem[index + 7] << 56)
+		|((uint64_t) mem->mem[index + 1] << 8)
+		|((uint64_t) mem->mem[index + 2] << 16)
+		|((uint64_t) mem->mem[index + 3] << 24)
+		|((uint64_t) mem->mem[index + 4] << 32)
+		|((uint64_t) mem->mem[index + 5] << 40)
+		|((uint64_t) mem->mem[index + 6] << 48)
+		|((uint64_t) mem->mem[index + 7] << 56)
 			);
 }
 
