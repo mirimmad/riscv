@@ -65,24 +65,24 @@ void ram_store(RAM *mem, uint64_t addr, uint64_t value, uint8_t size) {
   }
 }
 
-uint64_t ram_load8(RAM *mem, uint64_t addr) {
+static uint64_t ram_load8(RAM *mem, uint64_t addr) {
   size_t index = addr - RAM_BASE;
   return (uint64_t)mem->mem[index];
 }
 
-uint64_t ram_load16(RAM *mem, uint64_t addr) {
+static uint64_t ram_load16(RAM *mem, uint64_t addr) {
   size_t index = addr - RAM_BASE;
   return ((uint64_t)mem->mem[index] | ((uint64_t)mem->mem[index + 1] << 8));
 }
 
-uint64_t ram_load32(RAM *mem, uint64_t addr) {
+static uint64_t ram_load32(RAM *mem, uint64_t addr) {
   size_t index = addr - RAM_BASE;
   return ((uint64_t)mem->mem[index] | ((uint64_t)mem->mem[index + 1] << 8) |
           ((uint64_t)mem->mem[index + 2] << 16) |
           ((uint64_t)mem->mem[index + 3] << 24));
 }
 
-uint64_t ram_load64(RAM *mem, uint64_t addr) {
+static uint64_t ram_load64(RAM *mem, uint64_t addr) {
   size_t index = addr - RAM_BASE;
   return ((uint64_t)mem->mem[index] | ((uint64_t)mem->mem[index + 1] << 8) |
           ((uint64_t)mem->mem[index + 2] << 16) |
@@ -93,18 +93,18 @@ uint64_t ram_load64(RAM *mem, uint64_t addr) {
           ((uint64_t)mem->mem[index + 7] << 56));
 }
 
-void ram_store8(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store8(RAM *mem, uint64_t addr, uint64_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value;
 }
 
-void ram_store16(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store16(RAM *mem, uint64_t addr, uint64_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value & 0xFF;
   mem->mem[index + 1] = (uint8_t)(value >> 8) & 0xFF;
 }
 
-void ram_store32(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store32(RAM *mem, uint64_t addr, uint64_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value & 0xFF;
   mem->mem[index + 1] = (uint8_t)(value >> 8) & 0xFF;
@@ -112,7 +112,7 @@ void ram_store32(RAM *mem, uint64_t addr, uint64_t value) {
   mem->mem[index + 3] = (uint8_t)(value >> 24) & 0xFF;
 }
 
-void ram_store64(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store64(RAM *mem, uint64_t addr, uint64_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value & 0xFF;
   mem->mem[index + 1] = (uint8_t)(value >> 8) & 0xFF;
