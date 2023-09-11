@@ -31,6 +31,7 @@ typedef struct {
 } INST;
 
 CPU *newCPU(uint8_t *code, size_t len);
+void freeCPU(CPU *);
 void cpu_state(CPU *);
 uint64_t cpu_load(CPU *cpu, uint64_t addr, uint8_t size);
 void cpu_store(CPU *cup, uint64_t addr, uint64_t value, uint8_t size);

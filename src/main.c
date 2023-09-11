@@ -25,4 +25,6 @@ int main(int argc, char *argv[]) {
     cpu->pc += 4;
     cpu_execute(cpu, inst_raw);
   }
+
+  freeCPU(cpu);
 }

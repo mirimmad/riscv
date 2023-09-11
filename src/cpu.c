@@ -11,6 +11,11 @@ CPU *newCPU(uint8_t *code, size_t len) {
   return cpu;
 }
 
+void freeCPU(CPU *cpu) {
+  freeRAM(cpu->ram);
+  free(cpu);
+}
+
 void cpu_state(CPU *cpu) {
   for (int i = 0; i < 32; i++) {
     printf("r[%d]: %ld\n", i, cpu->regs[i]);
