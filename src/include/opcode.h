@@ -8,4 +8,16 @@ enum {
   ADD = 0x33,
 };
 
+// FUNCT3 for LOAD/STORE
+enum {
+  BYTE = 0x0,
+  HALF_WORD = 0x1,
+  WORD = 0x2,
+  DOUBLE_WORD = 0x3,
+  BYTE_UNSIGNED = 0x4,
+  HALF_WORD_UNSIGNED = 0x5,
+  WORD_UNSIGNED = 0x6,
+
+};
+
 #endif
