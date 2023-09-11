@@ -1,3 +1,5 @@
+#ifndef OPCODE_H
+#define OPCODE_H
 
 enum {
   LOAD = 0x3,
@@ -5,3 +7,5 @@ enum {
   ADDI = 0x13,
   ADD = 0x33,
 };
+
+#endif
