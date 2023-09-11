@@ -5,8 +5,8 @@
 
 static const unsigned int RAM_SIZE = 1204 * 1024 * 2; // 2 MiB
 
-// Because QEMU has it this way
-static const unsigned int RAM_BASE = 0x80000000;
+
+static const unsigned int RAM_BASE = 0x0;
 
 typedef struct {
   uint8_t *mem;
@@ -27,6 +27,5 @@ static void ram_store8(RAM *, uint64_t, uint64_t);
 static void ram_store16(RAM *, uint64_t, uint64_t);
 static void ram_store32(RAM *, uint64_t, uint64_t);
 static void ram_store64(RAM *, uint64_t, uint64_t);
-
 
 #endif
