@@ -1,11 +1,6 @@
 #include "include/mem.h"
 #include "include/common.h"
 
-void fatal(const char *msg) {
-  printf("[Fatal] %s\n", msg);
-  exit(-1);
-}
-
 RAM *newRAM(uint8_t *code, size_t len) {
   RAM *ram = (RAM *)malloc(sizeof(RAM));
   ram->mem = (uint8_t *)malloc(RAM_SIZE);
@@ -34,9 +29,7 @@ uint32_t ram_load(RAM *mem, uint32_t addr, uint8_t size) {
     r = ram_load64(mem, addr);
     break;
   default: {
-    char str[50];
-    sprintf(str, "RAM: invalid load size(%d)", size);
-    fatal(str);
+    fatal("RAM: invalid load size(%d)\n", size);
   }
   }
 
@@ -58,9 +51,7 @@ void ram_store(RAM *mem, uint32_t addr, uint32_t value, uint8_t size) {
     ram_store64(mem, addr, value);
     break;
   default: {
-    char str[50];
-    sprintf(str, "RAM: invalid store size(%d)", size);
-    fatal(str);
+    fatal("RAM: invalid store size(%d)\n", size);
   }
   }
 }

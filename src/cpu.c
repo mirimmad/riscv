@@ -128,8 +128,6 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     log("STORE r(%d)=%d at 0x%x\n", inst.rs2, val, addr);
   } break;
 
-
-
   case INTEGER_COMP_RI: {
     int32_t imm = i_imm(inst_raw);
     // The shift ammout is encoded in lower 5 bits if imm field
@@ -195,18 +193,20 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       log("ANDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
       log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
     } break;
+
+    default: {
+      fatal("Unknown FUNCT3 for INTEGER_COMP_RI");
+    }
     }
 
   } break;
-
 
   case ADD: {
     cpu->regs[inst.rd] = cpu->regs[inst.rs1] + cpu->regs[inst.rs2];
     log("ADD r(%d) <- r(%d) r(%d)\n", inst.rd, inst.rs1, inst.rs2);
   } break;
   default: {
-    log("Illegal Instruction 0x%x\n", inst.opcode);
-    exit(-1);
+    fatal("Illegal Instruction 0x%x\n", inst.opcode);
   } break;
   }
 }
