@@ -47,20 +47,25 @@ void cpu_decode(uint32_t inst_raw, INST *inst) {
   inst->funct7 = funct7;
 }
 
-int32_t i_imm(uint32_t inst_raw) {
+static inline int32_t i_imm(uint32_t inst_raw) {
   // imm[11:0] = inst[31:20]
   return ((int32_t)inst_raw) >> 20;
 }
 
-int32_t s_imm(uint32_t inst_raw) {
+static inline int32_t s_imm(uint32_t inst_raw) {
   // imm[11:5 | 4:0] = inst[31:25 | 11:7]
   return ((int32_t)(inst_raw & 0xFE000000)) >> 20 |
          ((int32_t)(inst_raw >> 7) & 0x1F);
 }
 
-int32_t logical_right_shift(int32_t x, int32_t n) {
+static inline int32_t logical_right_shift(int32_t x, int32_t n) {
   int size = sizeof(int) * 8;
   return (x >> n) & ~(((0x1 << size) >> n) << 1);
+}
+
+static inline uint8_t match_funct3_funct7(INST *inst, uint8_t funct3,
+                                          uint8_t funct7) {
+  return (inst->funct3 == funct3 && inst->funct7 == funct7);
 }
 
 INST inst;
@@ -99,7 +104,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       cpu->regs[inst.rd] = val;
     } break;
     default: {
-      log("Illegal FUNCT3 for LOAD: %d\n", inst.funct3);
+      fatal("Illegal FUNCT3 for LOAD: %d\n", inst.funct3);
       exit(-1);
     }
     }
@@ -122,7 +127,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       cpu_store(cpu, addr, val, 32);
       break;
     default: {
-      log("Illegal FUNCT3 for STORE: %d\n", inst.funct3);
+      fatal("Illegal FUNCT3 for STORE: %d\n", inst.funct3);
     }
     }
     log("STORE r(%d)=%d at 0x%x\n", inst.rs2, val, addr);
@@ -131,38 +136,33 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
   case INTEGER_COMP_RI: {
     int32_t imm = i_imm(inst_raw);
     // The shift ammout is encoded in lower 5 bits if imm field
-    int32_t shtamt = imm & SHAMT_MASK;
+    uint32_t shtamt = imm & SHAMT_MASK;
     switch (inst.funct3) {
     case ADDI: {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] + imm;
-      log("ADDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("ADDI");
     } break;
 
     case SLLI: {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] << shtamt;
-      log("SLLI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("SLLI")
     } break;
 
     case SLTI: {
-      int c = !(((int32_t)cpu->regs[inst.rs1]) < ((int32_t)imm));
+      int c = ((int32_t)cpu->regs[inst.rs1]) < ((int32_t)imm);
       cpu->regs[inst.rd] = c;
-      log("SLTI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, ((int32_t)imm));
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("SLTI");
     } break;
 
     case SLTIU: {
-      int c = !(cpu->regs[inst.rs1] < imm);
+      int c = cpu->regs[inst.rs1] < imm;
       cpu->regs[inst.rd] = c;
-      log("SLTIU: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("SLTIU");
     } break;
 
     case XORI: {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] ^ imm;
-      log("XORI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("XORI");
     } break;
 
     case RIGHT_SHIFT: {
@@ -170,28 +170,24 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       case 0x0: {
         // SRLI: Right-shift logical
         cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> shtamt;
-        log("SRLI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-        log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+        log_RI("SRLI");
       } break;
       case 0x20: {
         // SRAI: Right-shift arithmetic
         cpu->regs[inst.rd] = logical_right_shift(cpu->regs[inst.rs1], shtamt);
-        log("SRAI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, shtamt);
-        log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+        log_RI("SRAI");
       } break;
       }
     } break;
 
     case ORI: {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] | imm;
-      log("ORI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("ORI");
     } break;
 
     case ANDI: {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] & imm;
-      log("ANDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+      log_RI("ANDI");
     } break;
 
     default: {
@@ -201,10 +197,65 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
 
   } break;
 
-  case ADD: {
-    cpu->regs[inst.rd] = cpu->regs[inst.rs1] + cpu->regs[inst.rs2];
-    log("ADD r(%d) <- r(%d) r(%d)\n", inst.rd, inst.rs1, inst.rs2);
+  case INTEGER_COMP_RR: {
+    // The shift ammount is stored in lower 5 bit of rs2
+    uint32_t shtamt = cpu->regs[inst.rs2] & SHAMT_MASK;
+
+    if (match_funct3_funct7(&inst, 0x0, 0x0)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] + cpu->regs[inst.rs2];
+      log_RR("ADD");
+
+    } else if (match_funct3_funct7(&inst, 0x0, 0x01)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] * cpu->regs[inst.rs2];
+      log_RR("MUL");
+
+      // TODO: Implement rest of M extension
+    } else if (match_funct3_funct7(&inst, 0x0, 0x20)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] - cpu->regs[inst.rs2];
+      log_RR("SUB");
+
+    } else if (match_funct3_funct7(&inst, 0x1, 0x0)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] << cpu->regs[inst.rs2];
+      log_RR("SLL");
+      
+    } else if (match_funct3_funct7(&inst, 0x2, 0x0)) {
+      int c =
+          ((int32_t)cpu->regs[inst.rs1]) < ((int32_t)cpu->regs[inst.rs2]);
+      cpu->regs[inst.rd] = c;
+      log_RR("SLT");
+
+    } else if (match_funct3_funct7(&inst, 0x3, 0x0)) {
+      int c = cpu->regs[inst.rs1] < cpu->regs[inst.rs2];
+      cpu->regs[inst.rd] = c;
+      log_RR("SLTU");
+
+    } else if (match_funct3_funct7(&inst, 0x4, 0x0)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] ^ cpu->regs[inst.rs2];
+      log_RR("XOR");
+
+    } else if (match_funct3_funct7(&inst, 0x5, 0x0)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> cpu->regs[inst.rs2];
+      log_RR("SRL");
+
+    } else if (match_funct3_funct7(&inst, 0x5, 0x20)) {
+      cpu->regs[inst.rd] =
+          logical_right_shift(cpu->regs[inst.rs1], cpu->regs[inst.rs2]);
+      log_RR("SRA");
+
+    } else if (match_funct3_funct7(&inst, 0x6, 0x0)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] | cpu->regs[inst.rs2];
+      log_RR("OR");
+
+    } else if (match_funct3_funct7(&inst, 0x7, 0x0)) {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] & cpu->regs[inst.rs2];
+      log_RR("AND");
+
+    } else {
+      fatal("Unkown funct3(%x) & funct7(%x) for INTEGER_COMP_RR\n", inst.funct3,
+            inst.funct7);
+    }
   } break;
+
   default: {
     fatal("Illegal Instruction 0x%x\n", inst.opcode);
   } break;

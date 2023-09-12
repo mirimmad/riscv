@@ -9,7 +9,12 @@ enum {
   // ADDI, SLTI, SLTIU, ANDI, ORI, XORI, SLLI,
   // SRLI, SRAI
   INTEGER_COMP_RI = 0x13,
-  ADD = 0x33,
+
+  // The R-type Integer computation instructions
+  // or Integer Register-Regsiter Instructions
+  // ADD, SUB, SLT, SLTU, ANT, OR, XOR, SLI,
+  // SRL, SRA
+  INTEGER_COMP_RR = 0x33,
 };
 
 // FUNCT3 for LOAD/STORE

@@ -41,4 +41,16 @@ uint32_t cpu_fetch(CPU *);
 void cpu_decode(uint32_t raw_inst, INST *inst);
 void cpu_execute(CPU *, uint32_t inst);
 
+#define log_RR(INST)                                                           \
+  log(INST);                                                                   \
+  log(" :");                                                                   \
+  log("r(%d) <- r(%d) r(%d)\n", inst.rd, inst.rs1, inst.rs2);                  \
+  log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+
+#define log_RI(INST)                                                           \
+  log(INST);                                                                   \
+  log(" :");                                                                   \
+  log("r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);                          \
+  log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+
 #endif

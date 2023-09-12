@@ -8,9 +8,9 @@
 #include <string.h>
 
 #define log(args...) fprintf(stderr, ##args)
-#define fatal(args...) \
-    printf("[Fatal] "); \
-    printf(args); \
-    exit(-1);
+#define fatal(args...)                                                         \
+  printf("[Fatal] ");                                                          \
+  printf(args);                                                                \
+  exit(-1);
 
 #endif
