@@ -58,6 +58,11 @@ int32_t s_imm(uint32_t inst_raw) {
          ((int32_t)(inst_raw >> 7) & 0x1F);
 }
 
+int32_t logical_right_shift(int32_t x, int32_t n) {
+  int size = sizeof(int) * 8;
+  return (x >> n) & ~(((0x1 << size) >> n) << 1);
+}
+
 INST inst;
 void cpu_execute(CPU *cpu, uint32_t inst_raw) {
   cpu_decode(inst_raw, &inst);
@@ -120,34 +125,81 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       log("Illegal FUNCT3 for STORE: %d\n", inst.funct3);
     }
     }
-    log("STORE r(%d) at 0x%x\n", inst.rs2, addr);
+    log("STORE r(%d)=%d at 0x%x\n", inst.rs2, val, addr);
   } break;
 
+
+
   case INTEGER_COMP_RI: {
-    /*
-    int32_t imm = i_imm(inst_raw);
-    cpu->regs[inst.rd] = cpu->regs[inst.rs1] + imm;
-    log("ADDI r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
-    */
     int32_t imm = i_imm(inst_raw);
     // The shift ammout is encoded in lower 5 bits if imm field
     int32_t shtamt = imm & SHAMT_MASK;
     switch (inst.funct3) {
+    case ADDI: {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] + imm;
+      log("ADDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
+
+    case SLLI: {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] << shtamt;
+      log("SLLI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
+
+    case SLTI: {
+      int c = !(((int32_t)cpu->regs[inst.rs1]) < ((int32_t)imm));
+      cpu->regs[inst.rd] = c;
+      log("SLTI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, ((int32_t)imm));
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
+
+    case SLTIU: {
+      int c = !(cpu->regs[inst.rs1] < imm);
+      cpu->regs[inst.rd] = c;
+      log("SLTIU: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
+
+    case XORI: {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] ^ imm;
+      log("XORI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
+
+    case RIGHT_SHIFT: {
+      switch (inst.funct7) {
       case 0x0: {
-        // ADDI
-        cpu->regs[inst.rd] = cpu->regs[inst.rs1] + imm;
-        log("ADDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+        // SRLI: Right-shift logical
+        cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> shtamt;
+        log("SRLI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+        log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
       } break;
-
-      case 0x1: {
-        // SLLI
-        cpu->regs[inst.rd] = cpu->regs[inst.rs1] << imm;
-        log("SLLI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      case 0x20: {
+        // SRAI: Right-shift arithmetic
+        cpu->regs[inst.rd] = logical_right_shift(cpu->regs[inst.rs1], shtamt);
+        log("SRAI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, shtamt);
+        log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
       } break;
+      }
+    } break;
 
+    case ORI: {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] | imm;
+      log("ORI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
+
+    case ANDI: {
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] & imm;
+      log("ANDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
+    } break;
     }
 
   } break;
+
+
   case ADD: {
     cpu->regs[inst.rd] = cpu->regs[inst.rs1] + cpu->regs[inst.rs2];
     log("ADD r(%d) <- r(%d) r(%d)\n", inst.rd, inst.rs1, inst.rs2);

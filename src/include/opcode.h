@@ -24,4 +24,16 @@ enum {
 
 };
 
+// FUNCT3 for INTEGER_COMPI_RI
+enum {
+  ADDI = 0x0,
+  SLLI = 0x1,
+  SLTI = 0x2,
+  SLTIU = 0x3,
+  XORI = 0x4,
+  RIGHT_SHIFT = 0x5,
+  ORI = 0x6,
+  ANDI = 0x7,
+};
+
 #endif
