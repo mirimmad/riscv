@@ -4,7 +4,11 @@
 enum {
   LOAD = 0x3,
   STORE = 0x23,
-  ADDI = 0x13,
+  // The I-type Integer computation instructions
+  // or Integer Register-Immediate Instructions
+  // ADDI, SLTI, SLTIU, ANDI, ORI, XORI, SLLI,
+  // SRLI, SRAI
+  INTEGER_COMP_RI = 0x13,
   ADD = 0x33,
 };
 

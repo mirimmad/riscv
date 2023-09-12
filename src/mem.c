@@ -18,8 +18,8 @@ void freeRAM(RAM *mem) {
   free(mem);
 }
 
-uint64_t ram_load(RAM *mem, uint64_t addr, uint8_t size) {
-  uint64_t r = 0;
+uint32_t ram_load(RAM *mem, uint32_t addr, uint8_t size) {
+  uint32_t r = 0;
   switch (size) {
   case 8:
     r = ram_load8(mem, addr);
@@ -43,7 +43,7 @@ uint64_t ram_load(RAM *mem, uint64_t addr, uint8_t size) {
   return r;
 }
 
-void ram_store(RAM *mem, uint64_t addr, uint64_t value, uint8_t size) {
+void ram_store(RAM *mem, uint32_t addr, uint32_t value, uint8_t size) {
   switch (size) {
   case 8:
     ram_store8(mem, addr, value);
@@ -65,46 +65,48 @@ void ram_store(RAM *mem, uint64_t addr, uint64_t value, uint8_t size) {
   }
 }
 
-static uint64_t ram_load8(RAM *mem, uint64_t addr) {
+static uint32_t ram_load8(RAM *mem, uint32_t addr) {
   size_t index = addr - RAM_BASE;
-  return (uint64_t)mem->mem[index];
+  return (uint32_t)mem->mem[index];
 }
 
-static uint64_t ram_load16(RAM *mem, uint64_t addr) {
+static uint32_t ram_load16(RAM *mem, uint32_t addr) {
   size_t index = addr - RAM_BASE;
-  return ((uint64_t)mem->mem[index] | ((uint64_t)mem->mem[index + 1] << 8));
+  return ((uint32_t)mem->mem[index] | ((uint32_t)mem->mem[index + 1] << 8));
 }
 
-static uint64_t ram_load32(RAM *mem, uint64_t addr) {
+static uint32_t ram_load32(RAM *mem, uint32_t addr) {
   size_t index = addr - RAM_BASE;
-  return ((uint64_t)mem->mem[index] | ((uint64_t)mem->mem[index + 1] << 8) |
-          ((uint64_t)mem->mem[index + 2] << 16) |
-          ((uint64_t)mem->mem[index + 3] << 24));
+  return ((uint32_t)mem->mem[index] | ((uint32_t)mem->mem[index + 1] << 8) |
+          ((uint32_t)mem->mem[index + 2] << 16) |
+          ((uint32_t)mem->mem[index + 3] << 24));
 }
 
-static uint64_t ram_load64(RAM *mem, uint64_t addr) {
+static uint32_t ram_load64(RAM *mem, uint32_t addr) {
+  /*
   size_t index = addr - RAM_BASE;
-  return ((uint64_t)mem->mem[index] | ((uint64_t)mem->mem[index + 1] << 8) |
-          ((uint64_t)mem->mem[index + 2] << 16) |
-          ((uint64_t)mem->mem[index + 3] << 24) |
-          ((uint64_t)mem->mem[index + 4] << 32) |
-          ((uint64_t)mem->mem[index + 5] << 40) |
-          ((uint64_t)mem->mem[index + 6] << 48) |
-          ((uint64_t)mem->mem[index + 7] << 56));
+  return ((uint32_t)mem->mem[index] | ((uint32_t)mem->mem[index + 1] << 8) |
+          ((uint32_t)mem->mem[index + 2] << 16) |
+          ((uint32_t)mem->mem[index + 3] << 24) |
+          ((uint32_t)mem->mem[index + 4] << 32) |
+          ((uint32_t)mem->mem[index + 5] << 40) |
+          ((uint32_t)mem->mem[index + 6] << 48) |
+          ((uint32_t)mem->mem[index + 7] << 56));
+          */
 }
 
-static void ram_store8(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store8(RAM *mem, uint32_t addr, uint32_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value;
 }
 
-static void ram_store16(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store16(RAM *mem, uint32_t addr, uint32_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value & 0xFF;
   mem->mem[index + 1] = (uint8_t)(value >> 8) & 0xFF;
 }
 
-static void ram_store32(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store32(RAM *mem, uint32_t addr, uint32_t value) {
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value & 0xFF;
   mem->mem[index + 1] = (uint8_t)(value >> 8) & 0xFF;
@@ -112,7 +114,8 @@ static void ram_store32(RAM *mem, uint64_t addr, uint64_t value) {
   mem->mem[index + 3] = (uint8_t)(value >> 24) & 0xFF;
 }
 
-static void ram_store64(RAM *mem, uint64_t addr, uint64_t value) {
+static void ram_store64(RAM *mem, uint32_t addr, uint32_t value) {
+  /*
   size_t index = addr - RAM_BASE;
   mem->mem[index] = (uint8_t)value & 0xFF;
   mem->mem[index + 1] = (uint8_t)(value >> 8) & 0xFF;
@@ -122,17 +125,18 @@ static void ram_store64(RAM *mem, uint64_t addr, uint64_t value) {
   mem->mem[index + 5] = (uint8_t)(value >> 40) & 0xFF;
   mem->mem[index + 6] = (uint8_t)(value >> 48) & 0xFF;
   mem->mem[index + 7] = (uint8_t)(value >> 56) & 0xFF;
+  */
 }
 
 void RAM_test() {
   uint8_t c[] = {0x1};
   RAM *mem = newRAM(c, 1);
   ram_store(mem, RAM_BASE + 1, 10, 8);
-  uint64_t v8 = ram_load(mem, RAM_BASE + 1, 8);
+  uint32_t v8 = ram_load(mem, RAM_BASE + 1, 8);
   assert(v8 == 10);
 
   ram_store(mem, RAM_BASE + 2, 123456789, 64);
-  uint64_t v64 = ram_load(mem, RAM_BASE + 2, 64);
+  uint32_t v64 = ram_load(mem, RAM_BASE + 2, 64);
   assert(v64 == 123456789);
 
   freeRAM(mem);

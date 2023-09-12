@@ -14,9 +14,10 @@
 #define FUNCT7_SHIFT 25
 #define FUNCT3_MASK 0x7
 #define FUNCT7_MASK 0x7F
+#define SHAMT_MASK 0x1F
 
 typedef struct {
-  uint64_t regs[32];
+  uint32_t regs[32];
   size_t pc;
   RAM *ram;
 } CPU;
@@ -33,11 +34,11 @@ typedef struct {
 CPU *newCPU(uint8_t *code, size_t len);
 void freeCPU(CPU *);
 void cpu_state(CPU *);
-uint64_t cpu_load(CPU *cpu, uint64_t addr, uint8_t size);
-void cpu_store(CPU *cup, uint64_t addr, uint64_t value, uint8_t size);
+uint32_t cpu_load(CPU *cpu, uint32_t addr, uint8_t size);
+void cpu_store(CPU *cup, uint32_t addr, uint32_t value, uint8_t size);
 
-uint64_t cpu_fetch(CPU *);
-void cpu_decode(uint64_t raw_inst, INST *inst);
-void cpu_execute(CPU *, uint64_t inst);
+uint32_t cpu_fetch(CPU *);
+void cpu_decode(uint32_t raw_inst, INST *inst);
+void cpu_execute(CPU *, uint32_t inst);
 
 #endif

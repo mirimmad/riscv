@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   CPU *cpu = newCPU(code, codeSize);
 
   while (cpu->pc < codeSize) {
-    uint64_t inst_raw = cpu_fetch(cpu);
+    uint32_t inst_raw = cpu_fetch(cpu);
     cpu->pc += 4;
     cpu_execute(cpu, inst_raw);
   }

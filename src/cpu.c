@@ -22,16 +22,16 @@ void cpu_state(CPU *cpu) {
   }
 }
 
-uint64_t cpu_load(CPU *cpu, uint64_t addr, uint8_t size) {
-  ram_load(cpu->ram, addr, size);
+uint32_t cpu_load(CPU *cpu, uint32_t addr, uint8_t size) {
+  return ram_load(cpu->ram, addr, size);
 }
-void cpu_store(CPU *cpu, uint64_t addr, uint64_t value, uint8_t size) {
+void cpu_store(CPU *cpu, uint32_t addr, uint32_t value, uint8_t size) {
   ram_store(cpu->ram, addr, value, size);
 }
 
-uint64_t cpu_fetch(CPU *cpu) { return cpu_load(cpu, cpu->pc, 32); }
+uint32_t cpu_fetch(CPU *cpu) { return cpu_load(cpu, cpu->pc, 32); }
 
-void cpu_decode(uint64_t inst_raw, INST *inst) {
+void cpu_decode(uint32_t inst_raw, INST *inst) {
   uint8_t opcode = inst_raw & OPCODE_MASK;
   uint8_t rd = (inst_raw >> RD_SHIFT) & REG_ADDR_MASK;
   uint8_t rs1 = (inst_raw >> RS1_SHIFT) & REG_ADDR_MASK;
@@ -47,19 +47,19 @@ void cpu_decode(uint64_t inst_raw, INST *inst) {
   inst->funct7 = funct7;
 }
 
-int32_t i_imm(uint64_t inst_raw) {
+int32_t i_imm(uint32_t inst_raw) {
   // imm[11:0] = inst[31:20]
   return ((int32_t)inst_raw) >> 20;
 }
 
-int32_t s_imm(uint64_t inst_raw) {
+int32_t s_imm(uint32_t inst_raw) {
   // imm[11:5 | 4:0] = inst[31:25 | 11:7]
   return ((int32_t)(inst_raw & 0xFE000000)) >> 20 |
          ((int32_t)(inst_raw >> 7) & 0x1F);
 }
 
 INST inst;
-void cpu_execute(CPU *cpu, uint64_t inst_raw) {
+void cpu_execute(CPU *cpu, uint32_t inst_raw) {
   cpu_decode(inst_raw, &inst);
   cpu->regs[0] = 0;
   switch (inst.opcode) {
@@ -67,7 +67,7 @@ void cpu_execute(CPU *cpu, uint64_t inst_raw) {
   case LOAD: {
     int32_t imm = i_imm(inst_raw);
     uint32_t addr = cpu->regs[inst.rs1] + imm;
-    uint64_t val;
+    uint32_t val;
     switch (inst.funct3) {
     case BYTE: {
       val = (int8_t)cpu_load(cpu, addr, 8);
@@ -79,10 +79,6 @@ void cpu_execute(CPU *cpu, uint64_t inst_raw) {
     } break;
     case WORD: {
       val = (int32_t)cpu_load(cpu, addr, 32);
-      cpu->regs[inst.rd] = val;
-    } break;
-    case DOUBLE_WORD: {
-      val = cpu_load(cpu, addr, 64);
       cpu->regs[inst.rd] = val;
     } break;
     case BYTE_UNSIGNED: {
@@ -109,7 +105,7 @@ void cpu_execute(CPU *cpu, uint64_t inst_raw) {
   case STORE: {
     int32_t imm = s_imm(inst_raw);
     uint32_t addr = cpu->regs[inst.rs1] + imm;
-    uint64_t val = cpu->regs[inst.rs2];
+    uint32_t val = cpu->regs[inst.rs2];
     switch (inst.funct3) {
     case BYTE:
       cpu_store(cpu, addr, val, 8);
@@ -120,20 +116,37 @@ void cpu_execute(CPU *cpu, uint64_t inst_raw) {
     case WORD:
       cpu_store(cpu, addr, val, 32);
       break;
-    case DOUBLE_WORD:
-      cpu_store(cpu, addr, val, 64);
-      break;
     default: {
       log("Illegal FUNCT3 for STORE: %d\n", inst.funct3);
     }
     }
-    log("STORE r[%d] at 0x%x\n", inst.rs2, addr);
+    log("STORE r(%d) at 0x%x\n", inst.rs2, addr);
   } break;
 
-  case ADDI: {
+  case INTEGER_COMP_RI: {
+    /*
     int32_t imm = i_imm(inst_raw);
     cpu->regs[inst.rd] = cpu->regs[inst.rs1] + imm;
     log("ADDI r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+    */
+    int32_t imm = i_imm(inst_raw);
+    // The shift ammout is encoded in lower 5 bits if imm field
+    int32_t shtamt = imm & SHAMT_MASK;
+    switch (inst.funct3) {
+      case 0x0: {
+        // ADDI
+        cpu->regs[inst.rd] = cpu->regs[inst.rs1] + imm;
+        log("ADDI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      } break;
+
+      case 0x1: {
+        // SLLI
+        cpu->regs[inst.rd] = cpu->regs[inst.rs1] << imm;
+        log("SLLI: r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);
+      } break;
+
+    }
+
   } break;
   case ADD: {
     cpu->regs[inst.rd] = cpu->regs[inst.rs1] + cpu->regs[inst.rs2];

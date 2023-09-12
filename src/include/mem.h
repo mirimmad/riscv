@@ -16,16 +16,16 @@ RAM *newRAM(uint8_t *, size_t);
 void freeRAM(RAM *);
 void RAM_test();
 
-uint64_t ram_load(RAM *mem, uint64_t addr, uint8_t size);
-static uint64_t ram_load8(RAM *, uint64_t);
-static uint64_t ram_load16(RAM *, uint64_t);
-static uint64_t ram_load32(RAM *, uint64_t);
-static uint64_t ram_load64(RAM *, uint64_t);
+uint32_t ram_load(RAM *mem, uint32_t addr, uint8_t size);
+static uint32_t ram_load8(RAM *, uint32_t);
+static uint32_t ram_load16(RAM *, uint32_t);
+static uint32_t ram_load32(RAM *, uint32_t);
+static uint32_t ram_load64(RAM *, uint32_t);
 
-void ram_store(RAM *mem, uint64_t addr, uint64_t value, uint8_t size);
-static void ram_store8(RAM *, uint64_t, uint64_t);
-static void ram_store16(RAM *, uint64_t, uint64_t);
-static void ram_store32(RAM *, uint64_t, uint64_t);
-static void ram_store64(RAM *, uint64_t, uint64_t);
+void ram_store(RAM *mem, uint32_t addr, uint32_t value, uint8_t size);
+static void ram_store8(RAM *, uint32_t, uint32_t);
+static void ram_store16(RAM *, uint32_t, uint32_t);
+static void ram_store32(RAM *, uint32_t, uint32_t);
+static void ram_store64(RAM *, uint32_t, uint32_t);
 
 #endif
