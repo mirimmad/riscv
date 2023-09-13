@@ -12,12 +12,17 @@ int main(int argc, char *argv[]) {
 
   const char *filename = argv[1];
   FILE *file = fopen(filename, "rb");
+  if (!file) {
+    printf("Could not open the file.\n");
+    exit(-1);
+  }
   fseek(file, 0L, SEEK_END);
   size_t codeSize = ftell(file);
   rewind(file);
 
   uint8_t *code = (uint8_t *)malloc(codeSize);
   fread(code, sizeof(uint8_t), codeSize, file);
+  fclose(file);
   CPU *cpu = newCPU(code, codeSize);
 
   while (1) {
