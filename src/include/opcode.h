@@ -21,6 +21,7 @@ enum {
   JALR = 0x67,
   // Conditional branches: BEQ, BNE, BLT, BGE, BLTU, BGEU
   BRANCH = 0x63,
+  FENCE = 0xF,
 };
 
 // FUNCT3 for LOAD/STORE

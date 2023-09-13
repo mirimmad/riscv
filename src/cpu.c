@@ -419,6 +419,10 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     }
   } break;
 
+  case FENCE: {
+    // ignore
+  };
+
   default: {
     fatal("Illegal Instruction 0x%x\n", inst.opcode);
   } break;
