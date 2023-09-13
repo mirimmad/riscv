@@ -15,6 +15,8 @@ enum {
   // ADD, SUB, SLT, SLTU, ANT, OR, XOR, SLI,
   // SRL, SRA
   INTEGER_COMP_RR = 0x33,
+  LUI = 0x37,
+  AUIPC = 0x17,
 };
 
 // FUNCT3 for LOAD/STORE

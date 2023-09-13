@@ -58,6 +58,10 @@ static inline int32_t s_imm(uint32_t inst_raw) {
          ((int32_t)(inst_raw >> 7) & 0x1F);
 }
 
+static inline int32_t u_imm(uint32_t inst_raw) {
+  return ((int32_t) inst_raw & 0xFFFFF000);
+}
+
 static inline int32_t logical_right_shift(int32_t x, int32_t n) {
   int size = sizeof(int) * 8;
   return (x >> n) & ~(((0x1 << size) >> n) << 1);
@@ -254,6 +258,18 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       fatal("Unkown funct3(%x) & funct7(%x) for INTEGER_COMP_RR\n", inst.funct3,
             inst.funct7);
     }
+  } break;
+
+  case LUI: {
+    int32_t imm = u_imm(inst_raw);
+    cpu->regs[inst.rd] = imm;
+    log_RI("LUI");
+  } break;
+
+  case AUIPC: {
+    int32_t imm = u_imm(inst_raw);
+    cpu->regs[inst.rd] = (cpu->pc - 4) + imm;
+    log_RI("AUIPC");
   } break;
 
   default: {
