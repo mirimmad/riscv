@@ -214,51 +214,51 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     // The shift ammount is stored in lower 5 bit of rs2
     uint32_t shtamt = cpu->regs[inst.rs2] & SHAMT_MASK;
 
-    if (match_funct3_funct7(&inst, 0x0, 0x0)) {
+    if (match_funct3_funct7(&inst, ADD)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] + cpu->regs[inst.rs2];
       log_RR("ADD");
 
-    } else if (match_funct3_funct7(&inst, 0x0, 0x01)) {
+    } else if (match_funct3_funct7(&inst, MUL)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] * cpu->regs[inst.rs2];
       log_RR("MUL");
 
       // TODO: Implement rest of M extension
-    } else if (match_funct3_funct7(&inst, 0x0, 0x20)) {
+    } else if (match_funct3_funct7(&inst, SUB)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] - cpu->regs[inst.rs2];
       log_RR("SUB");
 
-    } else if (match_funct3_funct7(&inst, 0x1, 0x0)) {
+    } else if (match_funct3_funct7(&inst, SLL)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] << cpu->regs[inst.rs2];
       log_RR("SLL");
 
-    } else if (match_funct3_funct7(&inst, 0x2, 0x0)) {
+    } else if (match_funct3_funct7(&inst, SLT)) {
       int c = ((int32_t)cpu->regs[inst.rs1]) < ((int32_t)cpu->regs[inst.rs2]);
       cpu->regs[inst.rd] = c;
       log_RR("SLT");
 
-    } else if (match_funct3_funct7(&inst, 0x3, 0x0)) {
+    } else if (match_funct3_funct7(&inst, SLTU)) {
       int c = cpu->regs[inst.rs1] < cpu->regs[inst.rs2];
       cpu->regs[inst.rd] = c;
       log_RR("SLTU");
 
-    } else if (match_funct3_funct7(&inst, 0x4, 0x0)) {
+    } else if (match_funct3_funct7(&inst, XOR)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] ^ cpu->regs[inst.rs2];
       log_RR("XOR");
 
-    } else if (match_funct3_funct7(&inst, 0x5, 0x0)) {
+    } else if (match_funct3_funct7(&inst, SRL)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> cpu->regs[inst.rs2];
       log_RR("SRL");
 
-    } else if (match_funct3_funct7(&inst, 0x5, 0x20)) {
+    } else if (match_funct3_funct7(&inst, SRA)) {
       cpu->regs[inst.rd] =
           logical_right_shift(cpu->regs[inst.rs1], cpu->regs[inst.rs2]);
       log_RR("SRA");
 
-    } else if (match_funct3_funct7(&inst, 0x6, 0x0)) {
+    } else if (match_funct3_funct7(&inst, OR)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] | cpu->regs[inst.rs2];
       log_RR("OR");
 
-    } else if (match_funct3_funct7(&inst, 0x7, 0x0)) {
+    } else if (match_funct3_funct7(&inst, AND)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] & cpu->regs[inst.rs2];
       log_RR("AND");
 
