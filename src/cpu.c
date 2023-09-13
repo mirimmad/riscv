@@ -1,4 +1,5 @@
 #include "include/cpu.h"
+#include "include/ecall.h"
 
 CPU *newCPU(uint8_t *code, size_t len) {
   CPU *cpu = (CPU *)malloc(sizeof(CPU));
@@ -422,6 +423,15 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
   case FENCE: {
     // ignore
   };
+
+  case ECALL: {
+    if (inst_raw == 0x100073)
+      goto out; // EBREAK
+
+    ecall_handler(cpu);
+
+  out:
+  } break;
 
   default: {
     fatal("Illegal Instruction 0x%x\n", inst.opcode);

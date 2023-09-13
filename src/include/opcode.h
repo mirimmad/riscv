@@ -22,6 +22,8 @@ enum {
   // Conditional branches: BEQ, BNE, BLT, BGE, BLTU, BGEU
   BRANCH = 0x63,
   FENCE = 0xF,
+  // ECALL and EBREAK
+  ECALL = 0x73,
 };
 
 // FUNCT3 for LOAD/STORE
