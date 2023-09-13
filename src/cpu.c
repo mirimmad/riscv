@@ -59,7 +59,16 @@ static inline int32_t s_imm(uint32_t inst_raw) {
 }
 
 static inline int32_t u_imm(uint32_t inst_raw) {
-  return ((int32_t) inst_raw & 0xFFFFF000);
+  // imm[20:0] = inst[31:12]
+  return ((int32_t)inst_raw & 0xFFFFF000);
+}
+
+static inline int32_t j_imm(uint32_t inst_raw) {
+  // imm[20|10:1|11|19:12] = inst[31|30:21|20|19:12]
+  return ((uint32_t)(((int32_t)(inst_raw & 0x80000000)) >> 11)) | // imm[20]
+         (inst_raw & 0xFF000) |                                   // imm[19:12]
+         ((inst_raw >> 9) & 0x800) |                              // imm[11]
+         ((inst_raw >> 20) & 0x7FE);                              // imm[10:1]
 }
 
 static inline int32_t logical_right_shift(int32_t x, int32_t n) {
@@ -221,10 +230,9 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     } else if (match_funct3_funct7(&inst, 0x1, 0x0)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] << cpu->regs[inst.rs2];
       log_RR("SLL");
-      
+
     } else if (match_funct3_funct7(&inst, 0x2, 0x0)) {
-      int c =
-          ((int32_t)cpu->regs[inst.rs1]) < ((int32_t)cpu->regs[inst.rs2]);
+      int c = ((int32_t)cpu->regs[inst.rs1]) < ((int32_t)cpu->regs[inst.rs2]);
       cpu->regs[inst.rd] = c;
       log_RR("SLT");
 
@@ -270,6 +278,29 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     int32_t imm = u_imm(inst_raw);
     cpu->regs[inst.rd] = (cpu->pc - 4) + imm;
     log_RI("AUIPC");
+  } break;
+
+  case JAL: {
+    int32_t imm = j_imm(inst_raw);
+    // The offset is sign-extended and added to the pc to form the jump target
+    // address.
+    // We subtract 4 from PC because we have in advance incremented it in the
+    // main loop
+    cpu->regs[inst.rd] = cpu->pc;
+    int32_t jmp_addr = imm + (cpu->pc - 4);
+    cpu->pc = jmp_addr;
+    log_JMP("JAL");
+  } break;
+
+  case JALR: {
+    // The target address is obtained by adding the 12-bit signed I-immediate to
+    // the register rs1. The address of the instruction following the jump
+    // (pc+4) is written to register rd.
+    cpu->regs[inst.rd] = cpu->pc;
+    int32_t imm = i_imm(inst_raw);
+    int32_t jmp_addr = cpu->regs[inst.rs1] + imm;
+    cpu->pc = jmp_addr;
+    log_JMP("JALR");
   } break;
 
   default: {

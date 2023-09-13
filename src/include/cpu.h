@@ -53,4 +53,9 @@ void cpu_execute(CPU *, uint32_t inst);
   log("r(%d) <- r(%d) %d\n", inst.rd, inst.rs1, imm);                          \
   log("r(%d)=%d\n", inst.rd, cpu->regs[inst.rd]);
 
+#define log_JMP(JMP)                                                           \
+  log(JMP);                                                                    \
+  log(" :Jump to addr %x\n", jmp_addr);                                        \
+  log("r(%d)=%d\n", inst.rd, cpu->pc);
+
 #endif

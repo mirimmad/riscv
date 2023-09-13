@@ -20,10 +20,13 @@ int main(int argc, char *argv[]) {
   fread(code, sizeof(uint8_t), codeSize, file);
   CPU *cpu = newCPU(code, codeSize);
 
-  while (cpu->pc < codeSize) {
+  while (1) {
     uint32_t inst_raw = cpu_fetch(cpu);
     cpu->pc += 4;
+    if (cpu->pc > codeSize) break;
     cpu_execute(cpu, inst_raw);
+
+    if (cpu->pc == 0) break;
   }
 
   freeCPU(cpu);
