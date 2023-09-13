@@ -230,7 +230,64 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] * cpu->regs[inst.rs2];
       log_RR("MUL");
 
-      // TODO: Implement rest of M extension
+    } else if (match_funct3_funct7(&inst, MULH)) {
+      uint32_t p =
+          ((int64_t)cpu->regs[inst.rs1] * (int64_t)cpu->regs[inst.rs2]) >> 32;
+      cpu->regs[inst.rd] = p;
+      log_RR("MULH");
+
+    } else if (match_funct3_funct7(&inst, MULHU)) {
+      uint32_t p =
+          ((uint64_t)cpu->regs[inst.rs1] * (uint64_t)cpu->regs[inst.rs2]) >> 32;
+      cpu->regs[inst.rd] = p;
+      log_RR("MULHU");
+
+    } else if (match_funct3_funct7(&inst, MULHSU)) {
+      uint32_t p =
+          ((int64_t)cpu->regs[inst.rs1] * (uint64_t)cpu->regs[inst.rs2]) >> 32;
+      cpu->regs[inst.rd] = p;
+      log_RR("MULHSU");
+
+    } else if (match_funct3_funct7(&inst, DIV)) {
+      uint32_t r;
+      if (cpu->regs[inst.rs2] == 0) {
+        r = -1;
+      } else {
+        r = (int32_t)cpu->regs[inst.rs1] / (int32_t)cpu->regs[inst.rs2];
+      }
+      cpu->regs[inst.rd] = r;
+      log_RR("DIV");
+
+    } else if (match_funct3_funct7(&inst, DIVU)) {
+      uint32_t r;
+      if (cpu->regs[inst.rs2] == 0) {
+        r = INT32_MAX;
+      } else {
+        r = cpu->regs[inst.rs1] / cpu->regs[inst.rs2];
+      }
+      cpu->regs[inst.rd] = r;
+      log_RR("DIVU");
+
+    } else if (match_funct3_funct7(&inst, REM)) {
+      uint32_t r;
+      if (cpu->regs[inst.rs2] == 0) {
+        r = cpu->regs[inst.rs1];
+      } else {
+        r = (int32_t)cpu->regs[inst.rs1] % (int32_t)cpu->regs[inst.rs2];
+      }
+      cpu->regs[inst.rd] = r;
+      log_RR("REM");
+
+    } else if (match_funct3_funct7(&inst, REMU)) {
+      uint32_t r;
+      if (cpu->regs[inst.rs2] == 0) {
+        r = cpu->regs[inst.rs1];
+      } else {
+        r = cpu->regs[inst.rs1] % cpu->regs[inst.rs2];
+      }
+      cpu->regs[inst.rd] = r;
+      log_RR("REMU");
+
     } else if (match_funct3_funct7(&inst, SUB)) {
       cpu->regs[inst.rd] = cpu->regs[inst.rs1] - cpu->regs[inst.rs2];
       log_RR("SUB");
