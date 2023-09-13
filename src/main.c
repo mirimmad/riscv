@@ -34,5 +34,7 @@ int main(int argc, char *argv[]) {
     if (cpu->pc == 0) break;
   }
 
+  cpu_state(cpu);
+
   freeCPU(cpu);
 }

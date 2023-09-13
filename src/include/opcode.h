@@ -19,6 +19,8 @@ enum {
   AUIPC = 0x17,
   JAL = 0x6F,
   JALR = 0x67,
+  // Conditional branches: BEQ, BNE, BLT, BGE, BLTU, BGEU
+  BRANCH = 0x63,
 };
 
 // FUNCT3 for LOAD/STORE
@@ -58,5 +60,14 @@ enum {
 #define OR 0x6, 0x0
 #define AND 0x7, 0x0
 
+// FUNCT3 for BRANCH
+enum {
+  BEQ = 0x0,
+  BNE = 0x1,
+  BLT = 0x4,
+  BGE = 0x5,
+  BLTU = 0x6,
+  BGEU = 0x7,
+};
 
 #endif

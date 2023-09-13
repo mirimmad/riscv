@@ -55,7 +55,13 @@ void cpu_execute(CPU *, uint32_t inst);
 
 #define log_JMP(JMP)                                                           \
   log(JMP);                                                                    \
-  log(" :Jump to addr %x\n", jmp_addr);                                        \
+  log(" :Jump to addr 0x%x\n", jmp_addr);                                      \
   log("r(%d)=%d\n", inst.rd, cpu->pc);
+
+#define log_BR(BR)                                                             \
+  log(BR);                                                                     \
+  log(": r(%d)=%d r(%d)=%d\n", inst.rs1, cpu->regs[inst.rs1], inst.rs2,        \
+      cpu->regs[inst.rs2]);                                                    \
+  log("Taking branch: %s\n", (c) ? "true" : "false");
 
 #endif

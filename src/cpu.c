@@ -2,6 +2,7 @@
 
 CPU *newCPU(uint8_t *code, size_t len) {
   CPU *cpu = (CPU *)malloc(sizeof(CPU));
+  memset(cpu->regs, 0, sizeof(cpu->regs));
   cpu->regs[0] = 0;
   // Stack pointer
   cpu->regs[2] = RAM_BASE + RAM_SIZE;
@@ -71,6 +72,13 @@ static inline int32_t j_imm(uint32_t inst_raw) {
          ((inst_raw >> 20) & 0x7FE);                              // imm[10:1]
 }
 
+static inline int32_t b_imm(uint32_t inst_raw) {
+  // imm[12|10:5|4:1|11] = inst[31|30:25|11:8|7]
+  return ((uint32_t)(((int32_t)(inst_raw & 0x80000000)) >> 19)) |
+         ((inst_raw & 0x80) << 4) | ((inst_raw >> 20) & 0x7E0) |
+         ((inst_raw >> 7) & 0x1E);
+}
+
 static inline int32_t logical_right_shift(int32_t x, int32_t n) {
   int size = sizeof(int) * 8;
   return (x >> n) & ~(((0x1 << size) >> n) << 1);
@@ -117,7 +125,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       cpu->regs[inst.rd] = val;
     } break;
     default: {
-      fatal("Illegal FUNCT3 for LOAD: %d\n", inst.funct3);
+      fatal("unkown FUNCT3 for LOAD: %d\n", inst.funct3);
       exit(-1);
     }
     }
@@ -140,7 +148,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       cpu_store(cpu, addr, val, 32);
       break;
     default: {
-      fatal("Illegal FUNCT3 for STORE: %d\n", inst.funct3);
+      fatal("unkown FUNCT3 for STORE: %d\n", inst.funct3);
     }
     }
     log("STORE r(%d)=%d at 0x%x\n", inst.rs2, val, addr);
@@ -301,6 +309,57 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     int32_t jmp_addr = cpu->regs[inst.rs1] + imm;
     cpu->pc = jmp_addr;
     log_JMP("JALR");
+  } break;
+
+  case BRANCH: {
+    int32_t imm = b_imm(inst_raw);
+    switch (inst.funct3) {
+    case BEQ: {
+      int c = cpu->regs[inst.rs1] == cpu->regs[inst.rs2];
+      if (c)
+        cpu->pc += imm - 4;
+      log_BR("BEQ");
+    } break;
+
+    case BNE: {
+      int c = cpu->regs[inst.rs1] != cpu->regs[inst.rs2];
+      if (c)
+        cpu->pc += imm - 4;
+      log_BR("BNE");
+    } break;
+
+    case BLT: {
+      int c = ((int32_t)cpu->regs[inst.rs1]) < ((int32_t)cpu->regs[inst.rs2]);
+      if (c)
+        cpu->pc += imm - 4;
+      log_BR("BLT");
+    } break;
+
+    case BGE: {
+      int c = ((int32_t)cpu->regs[inst.rs1]) >= ((int32_t)cpu->regs[inst.rs2]);
+      if (c)
+        cpu->pc += imm - 4;
+      log_BR("BGE");
+    } break;
+
+    case BLTU: {
+      int c = cpu->regs[inst.rs1] < cpu->regs[inst.rs2];
+      if (c)
+        cpu->pc += imm - 4;
+      log_BR("BLTU");
+    } break;
+
+    case BGEU: {
+      int c = cpu->regs[inst.rs1] >= cpu->regs[inst.rs2];
+      if (c)
+        cpu->pc += imm - 4;
+      log_BR("BGEU");
+    } break;
+
+    default: {
+      fatal("unknown funct3(%x) for BRANCH\n", inst.funct3);
+    }
+    }
   } break;
 
   default: {
