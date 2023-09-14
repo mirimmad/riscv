@@ -422,7 +422,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
 
   case FENCE: {
     // ignore
-  };
+  } break;
 
   case ECALL: {
     if (inst_raw == 0x100073)
