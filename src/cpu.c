@@ -191,12 +191,12 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       switch (inst.funct7) {
       case 0x0: {
         // SRLI: Right-shift logical
-        cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> shtamt;
+        cpu->regs[inst.rd] = logical_right_shift(cpu->regs[inst.rs1], shtamt);
         log_RI("SRLI");
       } break;
       case 0x20: {
         // SRAI: Right-shift arithmetic
-        cpu->regs[inst.rd] = logical_right_shift(cpu->regs[inst.rs1], shtamt);
+        cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> shtamt;
         log_RI("SRAI");
       } break;
       }
@@ -312,12 +312,12 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       log_RR("XOR");
 
     } else if (match_funct3_funct7(&inst, SRL)) {
-      cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> cpu->regs[inst.rs2];
+      cpu->regs[inst.rd] =
+          logical_right_shift(cpu->regs[inst.rs1], cpu->regs[inst.rs2]);
       log_RR("SRL");
 
     } else if (match_funct3_funct7(&inst, SRA)) {
-      cpu->regs[inst.rd] =
-          logical_right_shift(cpu->regs[inst.rs1], cpu->regs[inst.rs2]);
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> cpu->regs[inst.rs2];
       log_RR("SRA");
 
     } else if (match_funct3_funct7(&inst, OR)) {
