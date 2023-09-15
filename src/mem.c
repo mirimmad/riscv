@@ -13,6 +13,13 @@ void freeRAM(RAM *mem) {
   free(mem);
 }
 
+static uint32_t ram_load8(RAM *, uint32_t);
+static uint32_t ram_load16(RAM *, uint32_t);
+static uint32_t ram_load32(RAM *, uint32_t);
+static void ram_store8(RAM *, uint32_t, uint32_t);
+static void ram_store16(RAM *, uint32_t, uint32_t);
+static void ram_store32(RAM *, uint32_t, uint32_t);
+
 uint32_t ram_load(RAM *mem, uint32_t addr, uint8_t size) {
   uint32_t r = 0;
   switch (size) {

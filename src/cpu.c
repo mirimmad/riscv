@@ -177,7 +177,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
     } break;
 
     case SLTIU: {
-      int c = cpu->regs[inst.rs1] < imm;
+      int c = cpu->regs[inst.rs1] < (uint32_t)imm;
       cpu->regs[inst.rd] = c;
       log_RI("SLTIU");
     } break;
@@ -294,7 +294,7 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       log_RR("SUB");
 
     } else if (match_funct3_funct7(&inst, SLL)) {
-      cpu->regs[inst.rd] = cpu->regs[inst.rs1] << cpu->regs[inst.rs2];
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] << shtamt;
       log_RR("SLL");
 
     } else if (match_funct3_funct7(&inst, SLT)) {
@@ -312,12 +312,11 @@ void cpu_execute(CPU *cpu, uint32_t inst_raw) {
       log_RR("XOR");
 
     } else if (match_funct3_funct7(&inst, SRL)) {
-      cpu->regs[inst.rd] =
-          logical_right_shift(cpu->regs[inst.rs1], cpu->regs[inst.rs2]);
+      cpu->regs[inst.rd] = logical_right_shift(cpu->regs[inst.rs1], shtamt);
       log_RR("SRL");
 
     } else if (match_funct3_funct7(&inst, SRA)) {
-      cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> cpu->regs[inst.rs2];
+      cpu->regs[inst.rd] = cpu->regs[inst.rs1] >> shtamt;
       log_RR("SRA");
 
     } else if (match_funct3_funct7(&inst, OR)) {

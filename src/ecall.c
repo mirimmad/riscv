@@ -12,7 +12,7 @@ void ecall_handler(CPU *cpu) {
     FILE *stream;
 
     switch (fd) {
-    case STDOUT: {
+    case STDOUT:
       stream = stdout;
       break;
     case STDERR:
@@ -21,12 +21,11 @@ void ecall_handler(CPU *cpu) {
     default:
       fatal("invalid file-descriptor %d.\n", fd);
     }
-    }
 
-    for (int i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
       fprintf(stream, "%c", cpu_load(cpu, addr + i, 8));
     }
-  }
+  } break;
 
   case SYSCALL_EXIT: {
     int32_t exit_code = cpu->regs[10];
