@@ -20,7 +20,7 @@ void freeCPU(CPU *cpu) {
 
 void cpu_state(CPU *cpu) {
   for (int i = 0; i < 32; i++) {
-    printf("r[%d]: %ld\n", i, cpu->regs[i]);
+    printf("r[%d]: %d\n", i, (int32_t)cpu->regs[i]);
   }
 }
 

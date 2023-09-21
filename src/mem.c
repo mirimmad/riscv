@@ -20,7 +20,15 @@ static void ram_store8(RAM *, uint32_t, uint32_t);
 static void ram_store16(RAM *, uint32_t, uint32_t);
 static void ram_store32(RAM *, uint32_t, uint32_t);
 
+static inline void check_addr(int32_t addr) {
+  size_t index = addr - RAM_BASE;
+  if (index >= RAM_SIZE) {
+    fatal("out of memory.")
+  }
+}
+
 uint32_t ram_load(RAM *mem, uint32_t addr, uint8_t size) {
+  check_addr(addr);
   uint32_t r = 0;
   switch (size) {
   case 8:
@@ -41,6 +49,7 @@ uint32_t ram_load(RAM *mem, uint32_t addr, uint8_t size) {
 }
 
 void ram_store(RAM *mem, uint32_t addr, uint32_t value, uint8_t size) {
+  check_addr(addr);
   switch (size) {
   case 8:
     ram_store8(mem, addr, value);
@@ -92,7 +101,6 @@ static void ram_store32(RAM *mem, uint32_t addr, uint32_t value) {
   mem->mem[index + 2] = (uint8_t)(value >> 16) & 0xFF;
   mem->mem[index + 3] = (uint8_t)(value >> 24) & 0xFF;
 }
-
 
 void RAM_test() {
   uint8_t c[] = {0x1};
