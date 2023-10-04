@@ -23,7 +23,7 @@ static void ram_store32(RAM *, uint32_t, uint32_t);
 static inline void check_addr(int32_t addr) {
   size_t index = addr - RAM_BASE;
   if (index >= RAM_SIZE) {
-    fatal("out of memory.")
+    fatal("out of memory.\n")
   }
 }
 

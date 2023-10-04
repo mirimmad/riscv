@@ -8,7 +8,7 @@ void ecall_handler(CPU *cpu) {
     uint32_t fd = cpu->regs[10];
     uint32_t addr = cpu->regs[11];
     uint32_t count = cpu->regs[12];
-    log("ECALL: Writing to file-descriptor %d %d bytes\n", fd, count);
+    log("ECALL: Writing to file-descriptor %d %d bytes.\n", fd, count);
     FILE *stream;
 
     switch (fd) {
